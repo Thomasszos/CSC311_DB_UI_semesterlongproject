@@ -195,8 +195,7 @@ public class DB_GUI_Controller implements Initializable {
     @FXML
     protected void addRecord() {
         showSomeone();
-        lblFeedback.setVisible(true);
-        lblFeedback.setText("Record added");
+
     }
 
     @FXML
@@ -263,6 +262,8 @@ public class DB_GUI_Controller implements Initializable {
             MyLogger.makeLog(
                     results.fname + " " + results.lname + " " + results.major);
         });
+        lblFeedback.setVisible(true);
+        lblFeedback.setText("Record added");
     }
 
     private static enum Major {Business, CSC, CPIS, Math, CSE, English, Art}
