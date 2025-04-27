@@ -7,12 +7,14 @@ import service.MyLogger;
 
 import java.sql.*;
 public class DbConnectivityClass {
-    final static String DB_NAME="CSC311_BD_TEMP";
-        MyLogger lg= new MyLogger();
-        final static String SQL_SERVER_URL = "jdbc:mysql://server.mariadb.database.azure.com";//update this server name
-        final static String DB_URL = "jdbc:mysql://server.mariadb.database.azure.com/"+DB_NAME;//update this database name
-        final static String USERNAME = "csc311admin@server";// update this username
-        final static String PASSWORD = "FARM";// update this password
+    final static String DB_NAME="csc311thomasszostak2";
+    MyLogger lg= new MyLogger();
+    final String DB_URL = "jdbc:mysql://csc311thomasszostak2.mysql.database.azure.com:3306/dbname?serverTimezone=UTC&useSSL=true&requireSSL=false";
+    final String USERNAME = "thomasszostak";
+    final String PASSWORD = "FARM123$";
+
+    final String SQL_SERVER_URL = "jdbc:mysql://csc311thomasszostak2.mysql.database.azure.com:3306";
+    //final String DB_URL = "jdbc:mysql://csc311thomasszostak2.mysql.database.azure.com/csc311thomasszostak2";
 
 
         private final ObservableList<Person> data = FXCollections.observableArrayList();
@@ -73,6 +75,13 @@ public class DbConnectivityClass {
                         + "imageURL VARCHAR(200))";
                 statement.executeUpdate(sql);
 
+                String createAccountsTable = "CREATE TABLE IF NOT EXISTS accounts (" +
+                        "id INT PRIMARY KEY AUTO_INCREMENT," +
+                        "username VARCHAR(100) NOT NULL UNIQUE," +
+                        "password VARCHAR(200) NOT NULL," +
+                        "privileges VARCHAR(50) DEFAULT 'USER')";
+                statement.executeUpdate(createAccountsTable);
+
                 //check if we have users in the table users
                 statement = conn.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users");
@@ -92,6 +101,44 @@ public class DbConnectivityClass {
             }
 
             return hasRegistredUsers;
+        }
+
+        public boolean createAccount(String accUsername, String accPassword) {
+            connectToDatabase();
+            try{
+                Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                String sql = "INSERT INTO accounts (username, password) VALUES(?,?)";
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setString(1, accUsername);
+                preparedStatement.setString(2, accPassword);
+                int rowsIns = preparedStatement.executeUpdate();
+                preparedStatement.close();
+                conn.close();
+                return rowsIns > 0;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        public boolean login(String accUsername, String accPassword) {
+            connectToDatabase();
+            try{
+                Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+                String sql = "SELECT * FROM accounts WHERE username = ? AND password = ?";
+                PreparedStatement preparedStatement = conn.prepareStatement(sql);
+                preparedStatement.setString(1, accUsername);
+                preparedStatement.setString(2, accPassword);
+                ResultSet rs= preparedStatement.executeQuery();
+                boolean result = rs.next();
+                preparedStatement.close();
+                conn.close();
+                return result;
+            } catch (SQLException e){
+                e.printStackTrace();
+                return false;
+            }
+            //return true;
         }
 
         public void queryUserByLastName(String name) {
@@ -231,4 +278,21 @@ public class DbConnectivityClass {
             lg.makeLog(String.valueOf(id));
             return id;
         }
+
+    public void insertUserCredentials(String username, String password) {
+        connectToDatabase();
+        try {
+            Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+
+            String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+            PreparedStatement preparedStatement = conn.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password); // ⚡ ideally hash it, but simple for now
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
     }

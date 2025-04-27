@@ -1,5 +1,6 @@
 package viewmodel;
 
+import com.sun.jna.platform.win32.Netapi32Util;
 import dao.DbConnectivityClass;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.Person;
 import service.MyLogger;
+import service.UserSession;
 
 import java.io.File;
 import java.net.URL;
@@ -28,6 +30,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DB_GUI_Controller implements Initializable {
+
+    @FXML
+    Button btnEdit, btnDelete;
 
     @FXML
     TextField first_name, last_name, department, major, email, imageURL;
@@ -54,6 +59,17 @@ public class DB_GUI_Controller implements Initializable {
             tv_major.setCellValueFactory(new PropertyValueFactory<>("major"));
             tv_email.setCellValueFactory(new PropertyValueFactory<>("email"));
             tv.setItems(data);
+            btnDelete.setDisable(true);
+            btnEdit.setDisable(true);
+            tv.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    btnEdit.setDisable(false);
+                    btnDelete.setDisable(false);
+                } else {
+                    btnEdit.setDisable(true);
+                    btnDelete.setDisable(true);
+                }
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,6 +101,7 @@ public class DB_GUI_Controller implements Initializable {
     @FXML
     protected void logOut(ActionEvent actionEvent) {
         try {
+            //UserSession.getInstance().clear();
             Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
             Scene scene = new Scene(root, 900, 600);
             scene.getStylesheets().add(getClass().getResource("/css/lightTheme.css").getFile());
@@ -95,6 +112,8 @@ public class DB_GUI_Controller implements Initializable {
             e.printStackTrace();
         }
     }
+
+
 
     @FXML
     protected void closeApplication() {
