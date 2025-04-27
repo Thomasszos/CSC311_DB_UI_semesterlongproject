@@ -32,10 +32,15 @@ import java.util.ResourceBundle;
 public class DB_GUI_Controller implements Initializable {
 
     @FXML
-    Button btnEdit, btnDelete;
+    Button btnEdit, btnDelete, addBtn;
 
     @FXML
-    TextField first_name, last_name, department, major, email, imageURL;
+    private ComboBox<Major> cbMajor;
+    @FXML
+    private Label lblFeedback;
+
+    @FXML
+    TextField first_name, last_name, department, email, imageURL;
     @FXML
     ImageView img_view;
     @FXML
@@ -59,8 +64,10 @@ public class DB_GUI_Controller implements Initializable {
             tv_major.setCellValueFactory(new PropertyValueFactory<>("major"));
             tv_email.setCellValueFactory(new PropertyValueFactory<>("email"));
             tv.setItems(data);
+            cbMajor.getItems().addAll(Major.values());
             btnDelete.setDisable(true);
             btnEdit.setDisable(true);
+            lblFeedback.setVisible(false);
             tv.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue != null) {
                     btnEdit.setDisable(false);
@@ -70,6 +77,13 @@ public class DB_GUI_Controller implements Initializable {
                     btnDelete.setDisable(true);
                 }
             });
+            addBtn.setDisable(true);
+            first_name.textProperty().addListener((obs, oldText, newText) -> validateForAdd());
+            last_name.textProperty().addListener((obs, oldText, newText) -> validateForAdd());
+            department.textProperty().addListener((obs, oldText, newText) -> validateForAdd());
+            cbMajor.getSelectionModel().selectedItemProperty().addListener((obs, oldText, newText) -> validateForAdd());
+            email.textProperty().addListener((obs, oldText, newText) -> validateForAdd());
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -79,7 +93,7 @@ public class DB_GUI_Controller implements Initializable {
     protected void addNewRecord() {
 
             Person p = new Person(first_name.getText(), last_name.getText(), department.getText(),
-                    major.getText(), email.getText(), imageURL.getText());
+                    cbMajor.getValue().name(), email.getText(), imageURL.getText());
             cnUtil.insertUser(p);
             cnUtil.retrieveId(p);
             p.setId(cnUtil.retrieveId(p));
@@ -93,7 +107,7 @@ public class DB_GUI_Controller implements Initializable {
         first_name.setText("");
         last_name.setText("");
         department.setText("");
-        major.setText("");
+        cbMajor.setValue(null);
         email.setText("");
         imageURL.setText("");
     }
@@ -111,6 +125,18 @@ public class DB_GUI_Controller implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    protected void validateForAdd() {
+        boolean firstNameValid = first_name.getText().matches("[A-Za-z]{2,25}");
+        boolean lastNameValid = last_name.getText().matches("[A-Za-z]{2,25}");
+        boolean departmentValid = department.getText().matches("[A-Za-z\\s]{2,50}");
+        boolean majorValid = cbMajor.getValue() != null;
+        boolean emailValid = email.getText().matches("^[\\w.-]+@[\\w.-]+\\.\\w{2,}$");
+
+        boolean allValid = firstNameValid && lastNameValid && departmentValid && majorValid && emailValid;
+
+        addBtn.setDisable(!allValid);
     }
 
 
@@ -138,11 +164,13 @@ public class DB_GUI_Controller implements Initializable {
         Person p = tv.getSelectionModel().getSelectedItem();
         int index = data.indexOf(p);
         Person p2 = new Person(index + 1, first_name.getText(), last_name.getText(), department.getText(),
-                major.getText(), email.getText(),  imageURL.getText());
+                cbMajor.getValue().name(), email.getText(),  imageURL.getText());
         cnUtil.editUser(p.getId(), p2);
         data.remove(p);
         data.add(index, p2);
         tv.getSelectionModel().select(index);
+        lblFeedback.setVisible(true);
+        lblFeedback.setText("Record has been edited successfully");
     }
 
     @FXML
@@ -152,6 +180,8 @@ public class DB_GUI_Controller implements Initializable {
         cnUtil.deleteRecord(p);
         data.remove(index);
         tv.getSelectionModel().select(index);
+        lblFeedback.setVisible(true);
+        lblFeedback.setText("Record deleted");
     }
 
     @FXML
@@ -165,6 +195,8 @@ public class DB_GUI_Controller implements Initializable {
     @FXML
     protected void addRecord() {
         showSomeone();
+        lblFeedback.setVisible(true);
+        lblFeedback.setText("Record added");
     }
 
     @FXML
@@ -173,7 +205,7 @@ public class DB_GUI_Controller implements Initializable {
         first_name.setText(p.getFirstName());
         last_name.setText(p.getLastName());
         department.setText(p.getDepartment());
-        major.setText(p.getMajor());
+        cbMajor.setValue(Major.valueOf(p.getMajor()));
         email.setText(p.getEmail());
         imageURL.setText(p.getImageURL());
     }
@@ -233,7 +265,7 @@ public class DB_GUI_Controller implements Initializable {
         });
     }
 
-    private static enum Major {Business, CSC, CPIS}
+    private static enum Major {Business, CSC, CPIS, Math, CSE, English, Art}
 
     private static class Results {
 

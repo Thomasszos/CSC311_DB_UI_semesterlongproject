@@ -26,7 +26,7 @@ public class DbConnectivityClass {
             connectToDatabase();
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "SELECT * FROM users ";
+                String sql = "SELECT * FROM users1 ";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (!resultSet.isBeforeFirst()) {
@@ -67,7 +67,7 @@ public class DbConnectivityClass {
                 //Second, connect to the database and create the table "users" if cot created
                 conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
                 statement = conn.createStatement();
-                String sql = "CREATE TABLE IF NOT EXISTS users (" + "id INT( 10 ) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
+                String sql = "CREATE TABLE IF NOT EXISTS users1 (" + "id INT( 10 ) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
                         + "first_name VARCHAR(200) NOT NULL," + "last_name VARCHAR(200) NOT NULL,"
                         + "department VARCHAR(200),"
                         + "major VARCHAR(200),"
@@ -84,7 +84,7 @@ public class DbConnectivityClass {
 
                 //check if we have users in the table users
                 statement = conn.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users");
+                ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM users1");
 
                 if (resultSet.next()) {
                     int numUsers = resultSet.getInt(1);
@@ -145,7 +145,7 @@ public class DbConnectivityClass {
             connectToDatabase();
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "SELECT * FROM users WHERE last_name = ?";
+                String sql = "SELECT * FROM users1 WHERE last_name = ?";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 preparedStatement.setString(1, name);
 
@@ -172,7 +172,7 @@ public class DbConnectivityClass {
             connectToDatabase();
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "SELECT * FROM users ";
+                String sql = "SELECT * FROM users1 ";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
 
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -200,7 +200,7 @@ public class DbConnectivityClass {
             connectToDatabase();
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "INSERT INTO users (first_name, last_name, department, major, email, imageURL) VALUES (?, ?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO users1 (first_name, last_name, department, major, email, imageURL) VALUES (?, ?, ?, ?, ?, ?)";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 preparedStatement.setString(1, person.getFirstName());
                 preparedStatement.setString(2, person.getLastName());
@@ -223,7 +223,7 @@ public class DbConnectivityClass {
             connectToDatabase();
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "UPDATE users SET first_name=?, last_name=?, department=?, major=?, email=?, imageURL=? WHERE id=?";
+                String sql = "UPDATE users1 SET first_name=?, last_name=?, department=?, major=?, email=?, imageURL=? WHERE id=?";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 preparedStatement.setString(1, p.getFirstName());
                 preparedStatement.setString(2, p.getLastName());
@@ -245,7 +245,7 @@ public class DbConnectivityClass {
             connectToDatabase();
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "DELETE FROM users WHERE id=?";
+                String sql = "DELETE FROM users1 WHERE id=?";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 preparedStatement.setInt(1, id);
                 preparedStatement.executeUpdate();
@@ -262,7 +262,7 @@ public class DbConnectivityClass {
             int id;
             try {
                 Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-                String sql = "SELECT id FROM users WHERE email=?";
+                String sql = "SELECT id FROM users1 WHERE email=?";
                 PreparedStatement preparedStatement = conn.prepareStatement(sql);
                 preparedStatement.setString(1, p.getEmail());
 
@@ -284,7 +284,7 @@ public class DbConnectivityClass {
         try {
             Connection conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
 
-            String sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+            String sql = "INSERT INTO users1 (username, password) VALUES (?, ?)";
             PreparedStatement preparedStatement = conn.prepareStatement(sql);
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password); // ⚡ ideally hash it, but simple for now
